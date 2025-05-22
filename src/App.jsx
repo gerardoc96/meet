@@ -1,12 +1,15 @@
+import React from 'react'
 import { useState } from 'react'
 import './App.css'
+import EventList from './components/EventList'
 
-function App() {
-
+const App = () => {
   return (
-    <>
-    </>
-  )
+    <div className="App">
+      <EventList />
+    </div>
+  );
 }
 
-export default App
+
+export default App;
