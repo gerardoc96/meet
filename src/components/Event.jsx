@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 
-const Event = () => {
+const Event = ({ event }) => {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
-    <li></li>
+    <li className="event">
+      <h2>{event.summary}</h2>
+      <p>{event.start.dateTime}</p>
+      <p>{event.location}</p>
+      <button onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? 'hide details' : 'show details'}
+      </button>
+      {showDetails && (
+        <div className="event-details" data-testid="event-details" >
+          <h3>About event:</h3>
+          <p>{event.description}</p>
+          <a href={event.htmlLink} target="_blank">
+            See detials on Google Calendar
+          </a>
+        </div>
+      )}
+    </li>
   );
 }
 
