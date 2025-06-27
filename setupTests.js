@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+// @jest-environment jsdom
 
 import '@testing-library/jest-dom';
 
@@ -18,19 +18,22 @@ console.error = (...args) => {
   if (!ignoreMessage) originalError(...args);
 };
 
-const { ResizeObserver } = window;
+// --- SAFELY PATCH ResizeObserver ONLY WHEN window EXISTS ---
+if (typeof window !== 'undefined' && window.ResizeObserver) {
+  const { ResizeObserver } = window;
 
-beforeEach(() => {
-  //@ts-ignore
-  delete window.ResizeObserver;
-  window.ResizeObserver = jest.fn().mockImplementation(() => ({
-    observe: jest.fn(),
-    unobserve: jest.fn(),
-    disconnect: jest.fn(),
-  }));
-});
+  beforeEach(() => {
+    // @ts-ignore
+    delete window.ResizeObserver;
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
+  });
 
-afterEach(() => {
-  window.ResizeObserver = ResizeObserver;
-  jest.restoreAllMocks();
-});
+  afterEach(() => {
+    window.ResizeObserver = ResizeObserver;
+    jest.restoreAllMocks();
+  });
+}
