@@ -35,3 +35,65 @@ describe('show/hide event details', () => {
     expect(eventDetails).toBeNull();
   });
 });
+
+describe("filter events by city", () => {
+  let browser;
+  let page;
+
+  beforeAll(async () => {
+    browser = await puppeteer.launch({
+      headless: true,
+      //slowMo: 50,
+    });
+    page = await browser.newPage();
+  });
+
+  beforeEach(async () => {
+    await page.goto("http://localhost:5173/");
+    await page.waitForSelector(".event");
+    await page.waitForSelector("#city-search .city");
+  });
+
+  afterAll(async () => {
+    await browser.close();
+  });
+
+  test("When user hasn’t searched for a city, show upcoming events from all cities.", async () => {
+    const events = await page.$$(".event");
+    expect(events.length).toBe(32);
+  });
+
+  test("User should see a list of suggestions when they search for a city.", async () => {
+    const cityInput = "#city-search .city";
+    const suggestionItems = "#city-search .suggestions li";
+
+    await page.click(cityInput);
+    await page.type(cityInput, "Berlin", { delay: 100 });
+
+    await page.waitForSelector(suggestionItems);
+
+    const suggestions = await page.$$(suggestionItems);
+
+    expect(suggestions.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test("User can select a city from the suggested list.", async () => {
+    const cityInput = "#city-search .city";
+    const suggestionItems = "#city-search .suggestions li";
+
+    await page.click(cityInput);
+    await page.type(cityInput, "Berlin", { delay: 100 });
+    await page.waitForSelector(suggestionItems);
+
+    await page.click(`${suggestionItems}:first-child`);
+
+    const selectedValue = await page.$eval(
+      cityInput,
+      el => el.value
+    );
+    expect(selectedValue).toBe("Berlin, Germany");
+
+    const filteredEvents = await page.$$(".event");
+    expect(filteredEvents.length).toBe(17);
+  });
+});
