@@ -13,14 +13,22 @@ jest.mock('../api', () => ({
 describe('<NumberOfEvents /> component', () => {
 
   test('contains an element with the role of textbox', () => {
-    render(<NumberOfEvents />);
+    render(<NumberOfEvents
+      numberOfEvents="32"
+      setNumberOfEvents={() => { }}
+      setErrorAlert={() => { }}
+    />);
     const input = screen.getByRole('textbox');
     expect(input).toBeInTheDocument();
   });
 
 
   test('has a default value of 32', () => {
-    render(<NumberOfEvents numberOfEvents="32" />);
+    render(<NumberOfEvents
+      numberOfEvents="32"
+      setNumberOfEvents={() => { }}
+      setErrorAlert={() => { }}
+    />);
     const input = screen.getByRole('textbox');
     expect(input).toHaveValue('32');
   });
@@ -33,6 +41,7 @@ describe('<NumberOfEvents /> component', () => {
         <NumberOfEvents
           numberOfEvents={numberOfEvents}
           setNumberOfEvents={setNumberOfEvents}
+          setErrorAlert={() => { }}
         />
       );
     };
