@@ -19,21 +19,25 @@ console.error = (...args) => {
 };
 
 // --- SAFELY PATCH ResizeObserver ONLY WHEN window EXISTS ---
-if (typeof window !== 'undefined' && window.ResizeObserver) {
-  const { ResizeObserver } = window;
+beforeEach(() => {
+  // Save original ResizeObserver if it exists
+  global._originalResizeObserver = global.ResizeObserver;
 
-  beforeEach(() => {
-    // @ts-ignore
-    delete window.ResizeObserver;
-    window.ResizeObserver = jest.fn().mockImplementation(() => ({
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-      disconnect: jest.fn(),
-    }));
-  });
+  global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+});
 
-  afterEach(() => {
-    window.ResizeObserver = ResizeObserver;
-    jest.restoreAllMocks();
-  });
-}
+afterEach(() => {
+  // Restore original ResizeObserver if it was defined
+  if (global._originalResizeObserver) {
+    global.ResizeObserver = global._originalResizeObserver;
+    delete global._originalResizeObserver;
+  } else {
+    delete global.ResizeObserver;
+  }
+
+  jest.restoreAllMocks();
+});
